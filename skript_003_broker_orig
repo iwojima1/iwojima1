@@ -15,6 +15,7 @@ do
 	println "Starting the bridge script"
 
 	setvar $local_pub = ""
+	setvar $remote_pub = ""
 	subscribe local "#"
 
 % This is done after each MQTT (re)connect
@@ -31,6 +32,7 @@ do
 	% Publish this remotly
 	if not ($local_pub = $this_topic) then
 		publish remote $this_topic $this_data
+		setvar $remote_pub = $this_topic
 	else
 		setvar $local_pub = ""
 	endif
@@ -40,5 +42,9 @@ do
 on topic remote "#"
 do
 	% Publish this locally
-	setvar $local_pub = $this_topic
-	publish local $this_topic $this_data
+        if not ($remote_pub = $this_topic) then
+		publish local $this_topic $this_data
+		setvar $local_pub = $this_topic
+	else
+		setvar $remote_pub = ""
+	endif
